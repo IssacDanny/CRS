@@ -1,0 +1,96 @@
+services:
+  backend-app:
+    build: .
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - DATABASE_URL=postgres://admin:password123@postgres-db:5432/crs_db
+      - DB_USER=admin
+      - DB_PASSWORD=password123
+      - DB_HOST=postgres-app-db
+      - DB_PORT=5432
+      - DB_NAME=crs_db
+    depends_on:
+      postgres-app-db:
+        condition: service_healthy
+    restart: on-failure
+    
+  postgres-app-db:
+    image: postgres:14-alpine
+    container_name: postgres-app-db
+    restart: always
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password123
+      - POSTGRES_DB=crs_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_app_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d crs_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  kong-db:
+    image: postgres:14-alpine
+    container_name: kong-db
+    restart: always
+    environment:
+      - POSTGRES_USER=kong
+      - POSTGRES_PASSWORD=kongpass
+      - POSTGRES_DB=kong
+    ports:
+      - "5432:5432"
+    volumes:
+      - kong_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kong -d kong"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  kong-migrations:
+    image: kong:latest
+    command: "kong migrations bootstrap"
+    depends_on:
+      kong-db:
+        condition: service_healthy
+    restart: on-failure
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=kong-db
+      - KONG_PG_USER=kong
+      - KONG_PG_PASSWORD=kongpass
+
+  kong:
+    image: kong:latest
+    depends_on:
+      kong-migrations:
+        condition: service_completed_successfully
+      backend-app:
+        condition: service_started
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=kong-db
+      - KONG_PG_USER=kong
+      - KONG_PG_PASSWORD=kongpass
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001
+      - KONG_DECLARATIVE_CONFIG=/usr/local/kong/declarative/kong.yml
+    ports:
+      # Public-facing ports for the gateway
+      - "8000:8000" # The main proxy port for API traffic
+      - "8443:8443" # The SSL proxy port
+      - "8001:8001" # The Admin API port for configuration
+    volumes:
+      - ./kong.yml:/usr/local/kong/declarative/kong.yml
+
+volumes:
+  postgres_app_data:
+  kong_db_data:

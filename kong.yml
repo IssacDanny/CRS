@@ -1,0 +1,23 @@
+_format_version: "3.0"
+
+# 1. Define the "Service" - this is our backend API
+services:
+  - name: crs-backend-service
+    # Kong uses the Docker service name 'backend-app' to find our API
+    # on the internal Docker network.
+    url: http://backend-app:3000
+    connect_timeout: 60000
+    write_timeout: 60000
+    read_timeout: 60000
+
+# 2. Define the "Route" - this is how the outside world reaches the Service
+routes:
+  - name: crs-backend-route
+    # This route is linked to the service we defined above
+    service: crs-backend-service
+    # This tells Kong to catch any request whose path starts with /api
+    # and forward it to our backend service.
+    paths:
+      - /api/
+    strip_path: true # IMPORTANT: This removes /api before forwarding
+                     # e.g., /api/auth/login becomes /auth/login

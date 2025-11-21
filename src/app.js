@@ -1,0 +1,36 @@
+// src/app.js
+const express = require('express');
+const db = require('./config/db');
+
+// Import routes
+const authRoutes = require('./routes/auth.routes');
+const courseRoutes = require('./routes/course.routes');
+const enrollmentRoutes = require('./routes/enrollment.routes');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware to parse JSON bodies
+app.use(express.json());
+
+// Test the database connection on startup
+db.query('SELECT NOW()', (err, res) => {
+  if (err) {
+    console.error('Error connecting to the database:', err.stack);
+  } else {
+    console.log('Successfully connected to the database. Server time:', res.rows[0].now);
+  }
+});
+
+app.get('/', (req, res) => {
+  res.send('Course Registration System API is running!');
+});
+
+// Use the routers with a base path
+app.use('/api/auth', authRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/enrollments', enrollmentRoutes);
+
+app.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
+});
