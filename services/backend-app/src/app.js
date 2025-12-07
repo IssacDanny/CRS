@@ -1,6 +1,7 @@
 // src/app.js
 const express = require('express');
 const db = require('./config/db');
+const cors = require('cors');
 
 // Import routes
 const authRoutes = require('./routes/auth.routes');
@@ -9,6 +10,12 @@ const enrollmentRoutes = require('./routes/enrollment.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(cors({
+    origin: ["http://localhost:5173"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+}));
 
 // Middleware to parse JSON bodies
 app.use(express.json());
