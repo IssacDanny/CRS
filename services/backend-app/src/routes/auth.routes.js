@@ -9,4 +9,6 @@ router.post('/api/auth/register', authController.register);
 
 router.post('/api/auth/login', authController.login);
 
+router.get('/api/user', authController.getUser);
+
 module.exports = router;
