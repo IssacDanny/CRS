@@ -8,7 +8,7 @@ const create = async ({ courseCode, courseName, description, capacity, lecturerN
 };
 
 const findAll = async () => {
-  const { rows } = await db.query('SELECT * FROM courses ORDER BY created_at DESC');
+  const { rows } = await db.query('SELECT id, course_code, course_name, lecturer_name, start_time, end_time, day_of_week FROM courses');
   return rows;
 };
 
