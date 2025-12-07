@@ -48,7 +48,7 @@ const findByStudentAndCourse = async (studentId, courseId) => {
 const findCoursesByStudentId = async (studentId) => {
   const { rows } = await db.query(
     `SELECT 
-     c.id, c.course_code, c.course_name, c.description, c.lecturer_name, e.enrollment_date, c.day_of_week, c.start_time, c.end_time
+     c.id, c.course_code, c.course_name, c.group_code, c.lecturer_name, c.level, c.day_of_week, c.start_time, c.end_time, e.status
      FROM enrollments e
      JOIN courses c ON e.course_id = c.id
      WHERE e.student_id = $1`,
@@ -57,9 +57,15 @@ const findCoursesByStudentId = async (studentId) => {
   return rows;
 };
 
+const deleteEnrollment = async (studentId, courseId) => {
+  const { result } = await db.query(`DELETE FROM enrollments WHERE student_id = $1 AND course_id = $2`, [studentId, courseId]);
+  return result;
+}
+
 module.exports = {
   create,
   countByCourseId,
   findByStudentAndCourse,
   findCoursesByStudentId,
+  deleteEnrollment
 };

@@ -31,7 +31,18 @@ const getMyEnrollments = async (req, res) => {
   }
 };
 
+const deleteEnrollment = async (req, res) => {
+  try {
+    const studentId = req.user.id; // From our verifyToken middleware
+    const enrollments = await enrollmentService.deleteEnrollment(studentId, req.params.id);
+    res.status(200).json(enrollments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   create,
   getMyEnrollments,
+  deleteEnrollment
 };

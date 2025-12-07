@@ -6,9 +6,15 @@ const { verifyToken, checkRole } = require('../middleware/auth.middleware');
 
 // PROTECTED: Only a logged-in STUDENT can get their own enrollments.
 router.get(
-  '/api/enrollments/me',
+  '/api/enrollments',
   [verifyToken, checkRole(['STUDENT'])],
   enrollmentController.getMyEnrollments
+);
+
+router.delete(
+  '/api/enrollments/:id',
+  [verifyToken, checkRole(['STUDENT'])],
+  enrollmentController.deleteEnrollment
 );
 
 // PROTECTED: Only a logged-in STUDENT can enroll in a course.

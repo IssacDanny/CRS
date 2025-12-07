@@ -52,7 +52,16 @@ const getStudentEnrollments = async (studentId) => {
   return enrollmentRepository.findCoursesByStudentId(studentId);
 };
 
+const deleteEnrollment = async (studentId, courseId) => {
+  try {
+    return enrollmentRepository.deleteEnrollment(studentId, courseId);
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   enrollStudentInCourse,
   getStudentEnrollments,
+  deleteEnrollment
 };
