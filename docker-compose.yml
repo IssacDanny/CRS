@@ -4,6 +4,21 @@ services:
   # ---------------------------------------------------------------------------
   # CORE SERVICE
   # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./services/frontend  # Use the new directory context
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./services/frontend:/usr/src/ui
+      - /usr/src/ui/node_modules
+    restart: on-failure
+    networks:
+      - crs-network
+    depends_on:
+      - backend-app
+
   backend-app:
     build:
       context: ./services/backend-app  # Use the new directory context
