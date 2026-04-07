@@ -1,8 +1,9 @@
 {
   "name": "crs-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
+    "start": "node ./src/app.js",
     "cli": "node cli.js"
   },
   "keywords": [],
