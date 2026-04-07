@@ -15,7 +15,10 @@ curl -i -f -X POST http://kong-gateway:8001/services \
   -H "Content-Type: application/json" \
   -d '{"name": "crs-backend-service", "url": "http://backend-app:3000"}'
 
-if [ $? -ne 0 ] && [ $? -ne 22 ]; then
+# Capture the exit code of the curl command
+CURL_EXIT=$?
+
+if [ $CURL_EXIT -ne 0 ] &&[ $CURL_EXIT -ne 22 ]; then
   echo "!!! [Configurator] Failed to create Kong service. Aborting."
   exit 1
 fi
@@ -27,7 +30,10 @@ curl -i -f -X POST http://kong-gateway:8001/services/crs-backend-service/routes 
   -H "Content-Type: application/json" \
   -d '{"name": "crs-api-routes", "paths": ["/api"], "strip_path": false}'
 
-if [ $? -ne 0 ] && [ $? -ne 22 ]; then
+# Capture the exit code of the curl command
+CURL_EXIT=$?
+
+if [ $CURL_EXIT -ne 0 ] && [ $CURL_EXIT -ne 22 ]; then
   echo "!!! [Configurator] Failed to create Kong route. Aborting."
   exit 1
 fi
